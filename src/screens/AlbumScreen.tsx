@@ -15,6 +15,7 @@ import React, { useEffect, useState } from 'react';
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import AlbumHeader from '../components/AlbumHeader';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import CustomStatusBar from '../components/CustomStatusbar';
 
 const WIDTH = Dimensions.get('window').width;
 
@@ -23,6 +24,7 @@ interface Album {
   label: string;
   groupName: string;
   thumbnail?: string | null;
+  count?: number;
 }
 
 interface AlbumScreenProps {
@@ -44,11 +46,44 @@ const AlbumScreen: React.FC<AlbumScreenProps> = ({ navigation }) => {
   const [showModal, setShowModal] = useState(false);
 
   // Fetching permission and initializing album data
+  // useEffect(() => {
+  //   const init = async () => {
+  //     const granted = await hasPermission();
+  //     if (granted) {
+  //       const albumsList = await CameraRoll.getAlbums({ assetType: 'Photos' });
+  //       console.log('All Albums:', albumsList[0].count);
+  //       albumsList.forEach(album => {
+  //         console.log(`${album.title} count: ${album.count}`);
+  //       });
+  //       loadThumbnails();
+  //     }
+  //   };
+  //   init();
+  // }, []);
+
   useEffect(() => {
     const init = async () => {
       const granted = await hasPermission();
       if (granted) {
-        loadThumbnails();
+        try {
+          const albumsList = await CameraRoll.getAlbums({ assetType: 'Photos' });
+
+          const updatedAlbums = await Promise.all(
+            albums.map(async (album) => {
+              const matching = albumsList.find((a) => a.title === album.groupName);
+              const thumbnail = await getAlbumThumbnail(album.groupName);
+              return {
+                ...album,
+                thumbnail,
+                count: matching?.count ?? 0,
+              };
+            })
+          );
+
+          setAlbums(updatedAlbums);
+        } catch (err) {
+          console.error('Error fetching albums', err);
+        }
       }
     };
     init();
@@ -78,6 +113,12 @@ const AlbumScreen: React.FC<AlbumScreenProps> = ({ navigation }) => {
         groupName: groupName,
         assetType: 'Photos',
       });
+
+      const albumsList = await CameraRoll.getAlbums({ assetType: 'Photos' });
+      albumsList.forEach(album => {
+        console.log(`${album.title} count: ${album.count}`);
+      });
+
       return photos.edges[0]?.node.image.uri ?? null;
     } catch (err) {
       console.error("Error fetching album thumbnail", err);
@@ -111,6 +152,7 @@ const AlbumScreen: React.FC<AlbumScreenProps> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <CustomStatusBar translucent={false} hidden={false} />
       <AlbumHeader openFolderModal={() => setShowModal(true)} />
 
       <FlatList
@@ -134,9 +176,20 @@ const AlbumScreen: React.FC<AlbumScreenProps> = ({ navigation }) => {
               }
               style={styles.placeholderImg}
             />
-            <Text style={styles.albumName}>{item.label}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+              <Text style={styles.albumName}>{item.label} </Text>
+              <Text style={[styles.albumName, { opacity: 0.6 }]}>({item?.count})</Text>
+            </View>
           </TouchableOpacity>
         )}
+        ListFooterComponent={() => {
+          return (
+            <View style={{ justifyContent: 'center', alignItems: 'center', opacity: 0.4, margin: 5, marginBottom: 10 }}>
+              <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#fff' }}>Made with ❤️</Text>
+              <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#fff' }}>By - Ramkrishna Mandal</Text>
+            </View>
+          )
+        }}
       />
 
       {/* Modal for custom folder */}
@@ -181,7 +234,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: '#ddd',
   },
-  albumName: { marginTop: 6, fontSize: 16, fontWeight: '600', color: 'white' },
+  albumName: { marginTop: 6, fontSize: 14, fontWeight: '600', color: 'white' },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.4)',

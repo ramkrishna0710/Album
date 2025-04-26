@@ -1,8 +1,22 @@
-import { View, Text, FlatList, Dimensions, Image, StyleSheet } from 'react-native'
-import React, { FC, useEffect, useState } from 'react'
+import {
+    View,
+    Text,
+    FlatList,
+    Dimensions,
+    StyleSheet,
+    ActivityIndicator,
+} from 'react-native';
+import React, { FC, useEffect, useState } from 'react';
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import CarouselItem from '../components/CarouselItem';
-import Animated, { clamp, FadeIn, FadeOut, runOnJS, useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
+import Animated, {
+    clamp,
+    FadeIn,
+    FadeOut,
+    runOnJS,
+    useAnimatedScrollHandler,
+    useSharedValue,
+} from 'react-native-reanimated';
 
 interface CirclularSliderProps {
     route: any;
@@ -14,94 +28,108 @@ const _spaching = 12;
 const _itemTotalSize = _itemSize + _spaching;
 
 const CirclularSlider: FC<CirclularSliderProps> = ({ route }) => {
-
     const { album } = route.params ?? {};
 
     const [photos, setPhotos] = useState<any[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [activeIndex, setActiveIndex] = useState(0)
+    const [loading, setLoading] = useState<boolean>(false);
+    const [endCursor, setEndCursor] = useState<string | null>(null);
+    const [hasNextPage, setHasNextPage] = useState(true);
+    const [activeIndex, setActiveIndex] = useState(0);
+
+    const fetchPhotos = async (isFirstLoad = false) => {
+        if (!album || loading || (!isFirstLoad && !hasNextPage)) return;
+
+        try {
+            setLoading(true);
+            const result = await CameraRoll.getPhotos({
+                first: 10,
+                groupName: album.groupName,
+                assetType: 'Photos',
+                after: isFirstLoad ? undefined : endCursor ?? undefined,
+            });
+
+            const newPhotos = result.edges;
+
+            if (isFirstLoad) {
+                setPhotos(newPhotos);
+            } else {
+                setPhotos(prev => [...prev, ...newPhotos]);
+            }
+
+            setEndCursor(result.page_info.end_cursor ?? null);
+            setHasNextPage(result.page_info.has_next_page);
+        } catch (error) {
+            console.error('Error fetching photos:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchPhotos = async () => {
-            if (!album) return;
-
-            try {
-                setLoading(true);
-                const fetchedPhotos = await CameraRoll.getPhotos({
-                    first: 50, // You can adjust the number of photos loaded here
-                    groupName: album.groupName,
-                    assetType: 'Photos',
-                });
-                setPhotos(fetchedPhotos.edges);
-            } catch (error) {
-                console.error('Error fetching photos:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchPhotos();
+        fetchPhotos(true);
     }, [album]);
 
     const scrollX = useSharedValue(0);
+
     const onScroll = useAnimatedScrollHandler(e => {
-        scrollX.value = clamp(
-            e.contentOffset.x / _itemTotalSize,
-            0,
-            photos.length - 1
-        );
-        // console.log(scrollX.value);
+        scrollX.value = clamp(e.contentOffset.x / _itemTotalSize, 0, photos.length - 1);
         const newActiveIndex = Math.round(scrollX.value);
+        runOnJS(setActiveIndex)(newActiveIndex);
+    });
 
-        if (activeIndex !== newActiveIndex) {
-            runOnJS(setActiveIndex)(newActiveIndex)
-        }
-    })
-
-    if (!album) {
+    if (!loading && photos.length === 0) {
         return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <Text style={{ fontSize: 14, color: 'white', fontWeight: '700' }}>No album data available</Text>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#2C2C2C' }}>
+                <Text style={{ fontSize: 14, color: 'white', fontWeight: '700' }}>
+                    No {album?.groupName} data available
+                </Text>
             </View>
         );
     }
 
     return (
         <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'black' }}>
-            <View style={[StyleSheet.absoluteFillObject]}>
+            <View style={StyleSheet.absoluteFillObject}>
                 <Animated.Image
                     entering={FadeIn.duration(500)}
                     exiting={FadeOut.duration(500)}
                     key={`image-${activeIndex}`}
                     source={{ uri: photos[activeIndex]?.node.image.uri }}
-                    style={{ flex: 1 }}
+                    style={{ flex: 1, resizeMode: 'cover' }}
                 />
             </View>
+
             <Animated.FlatList
                 style={{ flexGrow: 0, height: _itemSize * 2 }}
                 contentContainerStyle={{
                     gap: _spaching,
-                    paddingHorizontal: (width - _itemSize) / 2
+                    paddingHorizontal: (width - _itemSize) / 2,
                 }}
                 data={photos}
                 keyExtractor={(_, index) => String(index)}
-                renderItem={({ item, index }) => {
-                    return <CarouselItem
+                renderItem={({ item, index }) => (
+                    <CarouselItem
                         imageUri={item.node.image.uri}
                         index={index}
                         scrollX={scrollX}
                     />
-                }}
+                )}
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                // scrolling
                 onScroll={onScroll}
-                scrollEventThrottle={1000 / 60}
+                scrollEventThrottle={16}
                 snapToInterval={_itemTotalSize}
-                decelerationRate={'fast'}
+                decelerationRate="fast"
+                onEndReached={() => fetchPhotos(false)}
+                onEndReachedThreshold={0.5}
+                ListFooterComponent={
+                    loading && hasNextPage ? (
+                        <ActivityIndicator style={{ padding: 20 }} color="white" />
+                    ) : null
+                }
             />
         </View>
-    )
-}
+    );
+};
 
-export default CirclularSlider
+export default CirclularSlider;

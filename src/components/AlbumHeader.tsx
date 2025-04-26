@@ -32,7 +32,7 @@ export default AlbumHeader
 
 const styles = StyleSheet.create({
     container: {
-        paddingVertical: 2,
+        paddingTop: 22,
         justifyContent: 'space-between',
         flexDirection: 'row',
         alignItems: 'center',
