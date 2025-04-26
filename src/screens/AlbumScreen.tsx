@@ -33,7 +33,12 @@ const AlbumScreen: React.FC<AlbumScreenProps> = ({ navigation }) => {
   const [albums, setAlbums] = useState<Album[]>([
     { id: '1', label: 'Camera', groupName: 'Camera' },
     { id: '2', label: 'WhatsApp', groupName: 'WhatsApp Images' },
-    { id: '3', label: 'Screenshots', groupName: 'Screenshots' }
+    { id: '3', label: 'Screenshots', groupName: 'Screenshots' },
+    { id: '4', label: 'Pictures', groupName: 'Pictures' },
+    { id: '5', label: 'Favorites', groupName: 'Favorites' },
+    { id: '6', label: 'Bluetooth', groupName: 'Bluetooth' },
+    { id: '7', label: 'Download', groupName: 'Download' },
+    { id: '8', label: 'Facebook', groupName: 'Facebook' },
   ]);
   const [newFolderName, setNewFolderName] = useState('');
   const [showModal, setShowModal] = useState(false);
@@ -117,7 +122,7 @@ const AlbumScreen: React.FC<AlbumScreenProps> = ({ navigation }) => {
           <TouchableOpacity
             onPress={() => {
               // Pass the selected album data to PhotoScreen
-              navigation.navigate('PhotoScreen', { album: item });
+              navigation.navigate('CirclularSlider', { album: item });
             }}
             style={styles.albumCard}
           >
@@ -168,7 +173,7 @@ const AlbumScreen: React.FC<AlbumScreenProps> = ({ navigation }) => {
 export default AlbumScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: '#2C2C2C' },
   albumCard: { margin: 8, justifyContent: 'flex-start' },
   placeholderImg: {
     height: WIDTH * 0.43,
@@ -176,7 +181,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: '#ddd',
   },
-  albumName: { marginTop: 6, fontSize: 16, fontWeight: '600' },
+  albumName: { marginTop: 6, fontSize: 16, fontWeight: '600', color: 'white' },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.4)',

@@ -11,7 +11,7 @@ const AlbumHeader = ({ openFolderModal }: any) => {
                 <TouchableOpacity onPress={openFolderModal}>
                     <Icon
                         iconFamily='MaterailCommunityIcons'
-                        color={'black'}
+                        color={'white'}
                         name='plus'
                         size={24}
                     />
@@ -19,7 +19,7 @@ const AlbumHeader = ({ openFolderModal }: any) => {
 
                 <Icon
                     iconFamily='Ionicons'
-                    color={'black'}
+                    color={'white'}
                     name='settings-outline'
                     size={22}
                 />
@@ -42,7 +42,8 @@ const styles = StyleSheet.create({
     headerTxt: {
         fontSize: 22,
         fontWeight: '700',
-        letterSpacing: 1.2
+        letterSpacing: 1.2,
+        color: 'white'
     },
     subContainer: {
         justifyContent: 'space-between',
@@ -52,5 +53,6 @@ const styles = StyleSheet.create({
     },
     edtTxt: {
         fontSize: 16,
+        color:'white'
     }
 })
