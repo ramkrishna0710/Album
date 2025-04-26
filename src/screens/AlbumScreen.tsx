@@ -219,6 +219,7 @@ const AlbumScreen: React.FC<AlbumScreenProps> = ({ navigation }) => {
           </View>
         </View>
       </Modal>
+      
     </View>
   );
 };

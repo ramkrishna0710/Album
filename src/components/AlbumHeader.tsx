@@ -1,8 +1,10 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import Icon from './Icon'
+import { useNavigation } from '@react-navigation/native'
 
 const AlbumHeader = ({ openFolderModal }: any) => {
+    const navigation = useNavigation()
     return (
         <View style={styles.container}>
             <Text style={styles.headerTxt}>Albums</Text>
@@ -16,13 +18,16 @@ const AlbumHeader = ({ openFolderModal }: any) => {
                         size={24}
                     />
                 </TouchableOpacity>
-
-                <Icon
-                    iconFamily='Ionicons'
-                    color={'white'}
-                    name='settings-outline'
-                    size={22}
-                />
+                <TouchableOpacity
+                    onPress={() => navigation.navigate('SettingsScreen')}
+                >
+                    <Icon
+                        iconFamily='Ionicons'
+                        color={'white'}
+                        name='settings-outline'
+                        size={22}
+                    />
+                </TouchableOpacity>
             </View>
         </View>
     )
@@ -53,6 +58,6 @@ const styles = StyleSheet.create({
     },
     edtTxt: {
         fontSize: 16,
-        color:'white'
+        color: 'white'
     }
 })

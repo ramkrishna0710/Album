@@ -55,6 +55,7 @@ const CircularSliderHeader: FC<CirclularSliderHeaderProps> = ({ photos, activeIn
             <CustomActionSheet
                 visible={sheetVisible}
                 onClose={() => setSheetVisible(false)}
+                
                 onOptionPress={({ index }: any) => {
                     // console.log('Selected option:', index);
                 }}

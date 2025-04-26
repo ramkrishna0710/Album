@@ -5,6 +5,7 @@ import {
     Dimensions,
     StyleSheet,
     ActivityIndicator,
+    TouchableOpacity,
 } from 'react-native';
 import React, { FC, useEffect, useState } from 'react';
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
@@ -18,6 +19,8 @@ import Animated, {
     useSharedValue,
 } from 'react-native-reanimated';
 import CircularSliderHeader from '../components/CircularSliderHeader';
+import Icon from '../components/Icon';
+import { useNavigation } from '@react-navigation/native';
 
 interface CirclularSliderProps {
     route: any;
@@ -30,6 +33,7 @@ const _itemTotalSize = _itemSize + _spaching;
 
 const CirclularSlider: FC<CirclularSliderProps> = ({ route }) => {
     const { album } = route.params ?? {};
+    const navigation = useNavigation()
 
     const [photos, setPhotos] = useState<any[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
@@ -81,6 +85,16 @@ const CirclularSlider: FC<CirclularSliderProps> = ({ route }) => {
     if (!loading && photos.length === 0) {
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#2C2C2C' }}>
+                <View style={{ position: 'absolute', top: 15, left: 15 }}>
+                    <TouchableOpacity onPress={() => navigation.goBack()}>
+                        <Icon
+                            name="chevron-back"
+                            iconFamily="Ionicons"
+                            size={25}
+                            color="#fff"
+                        />
+                    </TouchableOpacity>
+                </View>
                 <Text style={{ fontSize: 14, color: 'white', fontWeight: '700' }}>
                     No {album?.groupName} data available
                 </Text>
