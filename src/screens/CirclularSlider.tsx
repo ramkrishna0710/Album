@@ -101,7 +101,11 @@ const CirclularSlider: FC<CirclularSliderProps> = ({ route }) => {
             </View>
 
             <View style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
-                <CircularSliderHeader activeIndex={activeIndex} endCursor={endCursor} />
+                <CircularSliderHeader
+                    photos={photos}
+                    activeIndex={activeIndex}
+                    total={album.count}
+                />
             </View>
 
             <Animated.FlatList

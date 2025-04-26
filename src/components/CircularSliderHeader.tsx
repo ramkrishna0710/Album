@@ -3,12 +3,19 @@ import React, { FC, useState } from 'react';
 import Icon from './Icon';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
+import CustomActionSheet from './CustomActionSheet';
 
+interface CirclularSliderHeaderProps {
+    photos: any;
+    activeIndex: any;
+    total: any;
+}
 
-const CircularSliderHeader = ({ activeIndex, endCursor }) => {
+const CircularSliderHeader: FC<CirclularSliderHeaderProps> = ({ photos, activeIndex, total }) => {
 
     const [isFavorite, setIsFavorite] = useState(false);
     const navigation = useNavigation();
+    const [sheetVisible, setSheetVisible] = useState(false);
 
     return (
         <View style={styles.mainContainer}>
@@ -22,7 +29,7 @@ const CircularSliderHeader = ({ activeIndex, endCursor }) => {
                     />
                 </TouchableOpacity>
 
-                <Text style={styles.text}>{activeIndex + 1}/{endCursor + 1}</Text>
+                <Text style={styles.text}>{activeIndex + 1}/{total}</Text>
                 <View style={[styles.innerContainer, { gap: 5 }]}>
                     <TouchableOpacity onPress={() => setIsFavorite(!isFavorite)}>
                         <Icon
@@ -33,14 +40,25 @@ const CircularSliderHeader = ({ activeIndex, endCursor }) => {
                         />
                     </TouchableOpacity>
 
-                    <Icon
-                        name="ellipsis-vertical"
-                        iconFamily="Ionicons"
-                        size={20}
-                        color="#000"
-                    />
+                    <TouchableOpacity
+                        onPress={() => { setSheetVisible(true) }}
+                    >
+                        <Icon
+                            name="ellipsis-vertical"
+                            iconFamily="Ionicons"
+                            size={20}
+                            color="#000"
+                        />
+                    </TouchableOpacity>
                 </View>
             </View>
+            <CustomActionSheet
+                visible={sheetVisible}
+                onClose={() => setSheetVisible(false)}
+                onOptionPress={({ index }: any) => {
+                    // console.log('Selected option:', index);
+                }}
+            />
         </View>
     );
 };
@@ -57,6 +75,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         paddingVertical: 10,
         zIndex: 10,
+        opacity: 0.91
     },
     innerContainer: {
         flexDirection: 'row',
