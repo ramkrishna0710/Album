@@ -115,9 +115,9 @@ const AlbumScreen: React.FC<AlbumScreenProps> = ({ navigation }) => {
       });
 
       const albumsList = await CameraRoll.getAlbums({ assetType: 'Photos' });
-      albumsList.forEach(album => {
-        console.log(`${album.title} count: ${album.count}`);
-      });
+      // albumsList.forEach(album => {
+      //   console.log(`${album.title} count: ${album.count}`);
+      // });
 
       return photos.edges[0]?.node.image.uri ?? null;
     } catch (err) {
@@ -152,7 +152,7 @@ const AlbumScreen: React.FC<AlbumScreenProps> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <CustomStatusBar translucent={false} hidden={false} />
+      {/* <CustomStatusBar translucent={false} hidden={false} /> */}
       <AlbumHeader openFolderModal={() => setShowModal(true)} />
 
       <FlatList

@@ -39,7 +39,8 @@ const CarouselItem = ({ imageUri, index, scrollX }: { imageUri: string; index: n
                 source={{ uri: imageUri }}
                 style={{
                     flex: 1,
-                    borderRadius: _itemSize / 2
+                    borderRadius: _itemSize / 2,
+                    resizeMode: 'cover'
                 }}
             />
         </Animated.View>

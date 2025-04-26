@@ -17,6 +17,7 @@ import Animated, {
     useAnimatedScrollHandler,
     useSharedValue,
 } from 'react-native-reanimated';
+import CircularSliderHeader from '../components/CircularSliderHeader';
 
 interface CirclularSliderProps {
     route: any;
@@ -97,6 +98,10 @@ const CirclularSlider: FC<CirclularSliderProps> = ({ route }) => {
                     source={{ uri: photos[activeIndex]?.node.image.uri }}
                     style={{ flex: 1, resizeMode: 'cover' }}
                 />
+            </View>
+
+            <View style={{ position: 'absolute', top: 0, left: 0, right: 0 }}>
+                <CircularSliderHeader activeIndex={activeIndex} endCursor={endCursor} />
             </View>
 
             <Animated.FlatList

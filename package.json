@@ -7,7 +7,10 @@
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
-    "test": "jest"
+    "test": "jest",
+    "pod-install" : "cd ios && RCT_NEW_ARCH_ENABLED=1 bundle exce pod install",
+    "postinstall": "npx parch-package",
+    "generate-apk": "cd android && gradlew.bat assembleRelease"
   },
   "dependencies": {
     "@react-native-camera-roll/camera-roll": "^7.10.0",
